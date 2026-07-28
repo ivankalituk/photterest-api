@@ -3,10 +3,13 @@ import { TestService } from "./test.service";
 
 @Controller('test')
 export class TestController{
-    constructor(
-        private testService: TestService
-    ){}
+    private testService: TestService;
 
+    constructor(testService: TestService){
+
+        this.testService = testService;
+
+    }
     @Post()
     create(
         @Body() body:{name:string}
