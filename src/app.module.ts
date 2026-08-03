@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './modules/database/database.module';
-import { TestModule } from './modules/test/test.module';
+import { RegistrationModule } from './modules/registration/registration.module';
 
 
 @Module({
@@ -13,7 +13,7 @@ import { TestModule } from './modules/test/test.module';
         }),
 
         DatabaseModule,
-        TestModule
+        RegistrationModule
     ],
 
     controllers: [
