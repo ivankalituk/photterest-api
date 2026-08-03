@@ -1,11 +1,13 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { DatabaseService } from "../database/database.service";
+import { AuthService } from "../auth/auth.service";
 
 @Injectable()
 export class RegistrationService{
 
     constructor(
-        private readonly databaseService: DatabaseService
+        private readonly databaseService: DatabaseService,
+        private authService: AuthService
     ) {}
 
     async register(
@@ -28,7 +30,20 @@ export class RegistrationService{
             [nickname, email, password],
         )
 
-        return result.rows[0]
+        const user = result.rows[0];
+
+        const token = this.authService.generateToken(user)
+
+        return {
+            user:{
+                id:user.id,
+                nickname:user.nickname,
+                email:user.email,
+                role:user.role
+            },
+
+            token
+        };
     }
 
 
