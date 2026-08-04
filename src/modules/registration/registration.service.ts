@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { DatabaseService } from "../database/database.service";
 import { AuthService } from "../auth/auth.service";
+import { RegistrationDTO } from "./dto/registration.dto";
 
 @Injectable()
 export class RegistrationService{
@@ -11,11 +12,9 @@ export class RegistrationService{
     ) {}
 
     async register(
-        nickname: string,
-        email: string,
-        password: string
+        dto: RegistrationDTO
     ) {
-        const existingUser = await this.databaseService.query(`SELECT id FROM users WHERE email = $1`, [email])
+        const existingUser = await this.databaseService.query(`SELECT id FROM users WHERE email = $1`, [dto.email])
 
         if (existingUser.rows.length > 0){
             throw new BadRequestException('Email already exists')
@@ -27,7 +26,7 @@ export class RegistrationService{
             VALUES ($1, $2, $3)
             RETURNING id, nickname, email, avatar_url, role, created_at
             `,
-            [nickname, email, password],
+            [dto.nickname, dto.email, dto.password],
         )
 
         const user = result.rows[0];

@@ -1,5 +1,6 @@
 import { Body, Controller, Post } from "@nestjs/common";
 import { RegistrationService } from "./registration.service";
+import { RegistrationDTO } from "./dto/registration.dto";
 
 @Controller('auth')
 export class RegistrationController {
@@ -11,16 +12,8 @@ export class RegistrationController {
 
     @Post('register')
     register(
-        @Body() body: {
-            nickname: string;
-            email: string;
-            password: string;
-        },
+        @Body() dto: RegistrationDTO
     ) {
-        return this.registrationService.register(
-            body.nickname,
-            body.email,
-            body.password,
-        );
+        return this.registrationService.register(dto);
     }
 }
