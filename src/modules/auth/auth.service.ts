@@ -17,7 +17,7 @@ export class AuthService{
     // обязательно сделать типизацию
     generateToken(user: any){
         const payload = {
-            id: user.id,
+            id: Number(user.id),
             role: user.role
         }
 
@@ -27,7 +27,6 @@ export class AuthService{
     async login(dto: LoginDTO){
 
         const user = await this.prisma.users.findUnique({where: {email: dto.email}})
-
 
         if (!user) {
             throw new UnauthorizedException('Invalid credentials');
