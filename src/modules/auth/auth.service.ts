@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { LoginDTO } from "./dto/login.dto";
 import { DatabaseService } from "../database/database.service";
@@ -58,5 +58,11 @@ export class AuthService{
             },
             token,
         };
+    }
+
+    async logOut(user: any){
+        console.log(user)
+
+        return {message: "success"}
     }
 }
