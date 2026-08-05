@@ -3,11 +3,13 @@ import { DatabaseService } from "../database/database.service";
 import { AuthService } from "../auth/auth.service";
 import { RegistrationDTO } from "./dto/registration.dto";
 import * as bcrypt from 'bcrypt'
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class RegistrationService{
 
     constructor(
+        private readonly prisma: PrismaService,
         private readonly databaseService: DatabaseService,
         private authService: AuthService
     ) {}
@@ -15,24 +17,32 @@ export class RegistrationService{
     async register(
         dto: RegistrationDTO
     ) {
-        const existingUser = await this.databaseService.query(`SELECT id FROM users WHERE email = $1`, [dto.email])
 
-        if (existingUser.rows.length > 0){
+        const existingUser = await this.prisma.users.findUnique({where: {email: dto.email}})
+
+
+        if (existingUser){
             throw new BadRequestException('Email already exists')
         }
         
         const hashedPassword = await bcrypt.hash(dto.password, 10)
 
-        const result = await this.databaseService.query(
-            `
-            INSERT INTO users (nickname, email, password_hash)
-            VALUES ($1, $2, $3)
-            RETURNING id, nickname, email, avatar_url, role, created_at
-            `,
-            [dto.nickname, dto.email, hashedPassword],
-        )
-
-        const user = result.rows[0];
+        const user = await this.prisma.users.create({
+            data: {
+                nickname: dto.nickname,
+                email: dto.email,
+                password_hash: hashedPassword
+            },
+            select: {
+                id: true,
+                nickname: true,
+                email: true,
+                avatar_url: true,
+                role: true,
+                created_at: true,
+                updated_at: true
+            }
+        })
 
         const token = this.authService.generateToken(user)
 
@@ -47,6 +57,4 @@ export class RegistrationService{
             token
         };
     }
-
-
 }

@@ -1,29 +1,30 @@
 import { Injectable } from "@nestjs/common";
 import { DatabaseService } from "../database/database.service";
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class UsersService{
 
     constructor(
-        private readonly databaseService: DatabaseService
+        private readonly prisma: PrismaService
     ) {}
 
-    async findById(id: string){
-        const result = await this.databaseService.query(
-            `
-            SELECT
-                id,
-                nickname,
-                email,
-                avatar_url,
-                role,
-                created_at
-            FROM users
-            WHERE id = $1
-            `,
-            [id],
-        );
+    async findById(id: number){
+        const user = await this.prisma.users.findUnique(
+            {
+                where: {id: id},
+                select: {
+                    id: true,
+                    nickname: true,
+                    email: true,
+                    avatar_url: true,
+                    role: true,
+                    created_at: true,
+                    updated_at: true
+                }
+            }
+        )
         
-        return result.rows[0]
+        return user
     }
 }

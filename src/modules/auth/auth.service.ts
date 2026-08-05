@@ -3,12 +3,14 @@ import { JwtService } from "@nestjs/jwt";
 import { LoginDTO } from "./dto/login.dto";
 import { DatabaseService } from "../database/database.service";
 import * as bcrypt from 'bcrypt'
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class AuthService{
     constructor(
         private jwtService: JwtService,
-        private readonly databaseService: DatabaseService
+        private readonly databaseService: DatabaseService,
+        private readonly prisma: PrismaService
     ) {}
 
 
@@ -23,22 +25,27 @@ export class AuthService{
     }
 
     async login(dto: LoginDTO){
-        const result = await this.databaseService.query(
-            `SELECT * FROM users WHERE email = $1`,
-            [dto.email],
+
+        const user = await this.prisma.users.findUnique({where: {email: dto.email}})
+
+
+        if (!user) {
+            throw new UnauthorizedException('Invalid credentials');
+        }
+
+        if (!user.password_hash) {
+            throw new UnauthorizedException('You was logged in without password');
+        }
+
+        const isValid = await bcrypt.compare(
+            dto.password,
+            user.password_hash
         );
 
-        const user = result.rows[0]
-
-        if (!user){
-            throw new UnauthorizedException('Invalid credetials');
+        if (!isValid) {
+            throw new UnauthorizedException('Invalid password');
         }
 
-        const isValid = await bcrypt.compare(dto.password, user.password_hash)
-
-        if (!isValid){
-            throw new UnauthorizedException('Invalid Password')
-        }
 
         const token = this.generateToken(user)
 
