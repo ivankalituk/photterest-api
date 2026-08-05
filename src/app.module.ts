@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { DatabaseModule } from './modules/database/database.module';
 import { RegistrationModule } from './modules/registration/registration.module';
 import { UsersModule } from './modules/users/user.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 
 @Module({
@@ -12,7 +13,7 @@ import { UsersModule } from './modules/users/user.module';
         ConfigModule.forRoot({
             isGlobal: true,
         }),
-
+        PrismaModule,
         DatabaseModule,
         RegistrationModule,
         UsersModule
