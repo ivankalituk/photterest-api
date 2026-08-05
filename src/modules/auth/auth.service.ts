@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { LoginDTO } from "./dto/login.dto";
 import { DatabaseService } from "../database/database.service";
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class AuthService{
@@ -33,7 +34,9 @@ export class AuthService{
             throw new UnauthorizedException('Invalid credetials');
         }
 
-        if (user.password !== dto.password){
+        const isValid = await bcrypt.compare(dto.password, user.password_hash)
+
+        if (!isValid){
             throw new UnauthorizedException('Invalid Password')
         }
 

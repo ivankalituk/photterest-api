@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import { DatabaseService } from "../database/database.service";
 import { AuthService } from "../auth/auth.service";
 import { RegistrationDTO } from "./dto/registration.dto";
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class RegistrationService{
@@ -20,13 +21,15 @@ export class RegistrationService{
             throw new BadRequestException('Email already exists')
         }
         
+        const hashedPassword = await bcrypt.hash(dto.password, 10)
+
         const result = await this.databaseService.query(
             `
-            INSERT INTO users (nickname, email, password)
+            INSERT INTO users (nickname, email, password_hash)
             VALUES ($1, $2, $3)
             RETURNING id, nickname, email, avatar_url, role, created_at
             `,
-            [dto.nickname, dto.email, dto.password],
+            [dto.nickname, dto.email, hashedPassword],
         )
 
         const user = result.rows[0];
