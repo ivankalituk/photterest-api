@@ -1,7 +1,6 @@
 import { Injectable, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { LoginDTO } from "./dto/login.dto";
-import { DatabaseService } from "../database/database.service";
 import * as bcrypt from 'bcrypt'
 import { PrismaService } from "src/prisma/prisma.service";
 
@@ -9,7 +8,6 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class AuthService{
     constructor(
         private jwtService: JwtService,
-        private readonly databaseService: DatabaseService,
         private readonly prisma: PrismaService
     ) {}
 
@@ -17,7 +15,7 @@ export class AuthService{
     // обязательно сделать типизацию
     generateToken(user: any){
         const payload = {
-            id: Number(user.id),
+            id: user.id,
             role: user.role
         }
 

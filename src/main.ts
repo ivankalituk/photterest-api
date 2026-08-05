@@ -16,12 +16,6 @@ async function bootstrap() {
     }),
   );
 
-  // не уверен что решается так, но это решает
-  // проблему типа big int в js
-  (BigInt.prototype as any).toJSON = function () {
-      return Number(this);
-  };
-
   await app.listen(5000);
 }
 
