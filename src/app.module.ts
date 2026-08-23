@@ -6,6 +6,7 @@ import { DatabaseModule } from './modules/database/database.module';
 import { RegistrationModule } from './modules/registration/registration.module';
 import { UsersModule } from './modules/users/user.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 
 @Module({
@@ -16,7 +17,8 @@ import { PrismaModule } from './prisma/prisma.module';
         PrismaModule,
         DatabaseModule,
         RegistrationModule,
-        UsersModule
+        UsersModule,
+        AuthModule
     ],
 
     controllers: [
