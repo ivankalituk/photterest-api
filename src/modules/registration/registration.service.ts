@@ -10,7 +10,6 @@ export class RegistrationService{
 
     constructor(
         private readonly prisma: PrismaService,
-        private readonly databaseService: DatabaseService,
         private authService: AuthService
     ) {}
 

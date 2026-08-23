@@ -3,9 +3,15 @@ import { JwtService } from "@nestjs/jwt";
 import { LoginDTO } from "./dto/login.dto";
 import * as bcrypt from 'bcrypt'
 import { PrismaService } from "src/prisma/prisma.service";
+import { OAuth2Client } from "google-auth-library";
 
 @Injectable()
 export class AuthService{
+
+    private googleClient = new OAuth2Client(
+        process.env.GOOGLE_CLIENT_ID
+    )
+    
     constructor(
         private jwtService: JwtService,
         private readonly prisma: PrismaService
@@ -62,4 +68,16 @@ export class AuthService{
 
         return {message: "success"}
     }
+
+    async googleLogin(token: string){
+        const ticket = await this.googleClient.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID
+        })
+
+        const payload = ticket.getPayload()
+
+        return payload
+    }
+
 }
