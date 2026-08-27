@@ -28,18 +28,9 @@ export class RegistrationService{
 
         const user = await this.prisma.users.create({
             data: {
-                nickname: dto.nickname,
+                nickname: dto.email,
                 email: dto.email,
                 password_hash: hashedPassword
-            },
-            select: {
-                id: true,
-                nickname: true,
-                email: true,
-                avatar_url: true,
-                role: true,
-                created_at: true,
-                updated_at: true
             }
         })
 
@@ -48,9 +39,9 @@ export class RegistrationService{
         return {
             user:{
                 id: user.id,
-                nickname:user.nickname,
-                email:user.email,
-                role:user.role
+                nickname: user.nickname,
+                email: user.email,
+                role: user.role
             },
 
             token
