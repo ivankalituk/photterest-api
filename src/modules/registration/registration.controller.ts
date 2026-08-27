@@ -1,19 +1,13 @@
-import { Body, Controller, Post, Req, UseGuards } from "@nestjs/common";
-import { RegistrationService } from "./registration.service";
-import { RegistrationDTO } from "./dto/registration.dto";
+import { Body, Controller, Post } from '@nestjs/common';
+import { RegistrationService } from './registration.service';
+import { RegistrationDTO } from './dto/registration.dto';
 
 @Controller('auth')
 export class RegistrationController {
+  constructor(private readonly registrationService: RegistrationService) {}
 
-    constructor(
-        private readonly registrationService: RegistrationService,
-    ) {}
-
-
-    @Post('register')
-    register(
-        @Body() dto: RegistrationDTO
-    ) {
-        return this.registrationService.register(dto);
-    }
+  @Post('register')
+  register(@Body() dto: RegistrationDTO) {
+    return this.registrationService.register(dto);
+  }
 }

@@ -8,25 +8,20 @@ import { UsersModule } from './modules/users/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 
-
 @Module({
-    imports: [
-        ConfigModule.forRoot({
-            isGlobal: true,
-        }),
-        PrismaModule,
-        DatabaseModule,
-        RegistrationModule,
-        UsersModule,
-        AuthModule
-    ],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    PrismaModule,
+    DatabaseModule,
+    RegistrationModule,
+    UsersModule,
+    AuthModule,
+  ],
 
-    controllers: [
-        AppController
-    ],
+  controllers: [AppController],
 
-    providers: [
-        AppService
-    ],
+  providers: [AppService],
 })
 export class AppModule {}
