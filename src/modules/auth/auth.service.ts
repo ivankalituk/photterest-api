@@ -65,106 +65,114 @@ export class AuthService {
     return { message: 'success' };
   }
 
-  async googleLogin(token: string) {
-    const ticket = await this.googleClient.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const payload = ticket.getPayload();
-
-    if (!payload?.sub || !payload.email) {
-      throw new UnauthorizedException('Invalid Google account data');
-    }
-
-    if (!payload.email_verified) {
-      throw new UnauthorizedException('Google email is not verified');
-    }
-
-    const existingGoogleUser = await this.prisma.users.findUnique({
-      where: {
-        google_id: payload.sub,
+async googleLogin(token: string) {
+  const response = await fetch(
+    `https://www.googleapis.com/oauth2/v3/userinfo`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
-    });
+    },
+  );
 
-    if (existingGoogleUser) {
-      const jwt = this.generateToken(existingGoogleUser);
+  if (!response.ok) {
+    throw new UnauthorizedException('Invalid Google access token');
+  }
 
-      return {
-        user: {
-          id: existingGoogleUser.id,
-          nickname: existingGoogleUser.nickname,
-          email: existingGoogleUser.email,
-          birth_date: existingGoogleUser.birth_date,
-          avatar_url: existingGoogleUser.avatar_url,
-          google_id: existingGoogleUser.google_id,
-          role: existingGoogleUser.role,
-          created_at: existingGoogleUser.created_at,
-          updated_at: existingGoogleUser.updated_at,
-        },
-        token: jwt,
-      };
-    }
+  const payload = await response.json();
 
-    const existingEmailUser = await this.prisma.users.findUnique({
-      where: {
-        email: payload.email,
-      },
-    });
+  if (!payload.sub || !payload.email) {
+    throw new UnauthorizedException('Invalid Google account data');
+  }
 
-    if (existingEmailUser) {
-      const updatedUser = await this.prisma.users.update({
-        where: {
-          id: existingEmailUser.id,
-        },
-        data: {
-          google_id: payload.sub,
-        },
-      });
+  if (!payload.email_verified) {
+    throw new UnauthorizedException('Google email is not verified');
+  }
 
-      const jwt = this.generateToken(updatedUser);
+  const existingGoogleUser = await this.prisma.users.findUnique({
+    where: {
+      google_id: payload.sub,
+    },
+  });
 
-      return {
-        user: {
-          id: updatedUser.id,
-          nickname: updatedUser.nickname,
-          email: updatedUser.email,
-          birth_date: updatedUser.birth_date,
-          avatar_url: updatedUser.avatar_url,
-          google_id: updatedUser.google_id,
-          role: updatedUser.role,
-          created_at: updatedUser.created_at,
-          updated_at: updatedUser.updated_at,
-        },
-        token: jwt,
-      };
-    }
-
-    const newUser = await this.prisma.users.create({
-      data: {
-        nickname: payload.name ?? payload.email.split('@')[0],
-        email: payload.email,
-        google_id: payload.sub,
-        password_hash: null,
-        avatar_url: payload.picture ?? null,
-      },
-    });
-
-    const jwt = this.generateToken(newUser);
+  if (existingGoogleUser) {
+    const jwt = this.generateToken(existingGoogleUser);
 
     return {
       user: {
-        id: newUser.id,
-        nickname: newUser.nickname,
-        email: newUser.email,
-        birth_date: newUser.birth_date,
-        avatar_url: newUser.avatar_url,
-        google_id: newUser.google_id,
-        role: newUser.role,
-        created_at: newUser.created_at,
-        updated_at: newUser.updated_at,
+        id: existingGoogleUser.id,
+        nickname: existingGoogleUser.nickname,
+        email: existingGoogleUser.email,
+        birth_date: existingGoogleUser.birth_date,
+        avatar_url: existingGoogleUser.avatar_url,
+        google_id: existingGoogleUser.google_id,
+        role: existingGoogleUser.role,
+        created_at: existingGoogleUser.created_at,
+        updated_at: existingGoogleUser.updated_at,
       },
       token: jwt,
     };
   }
+
+  const existingEmailUser = await this.prisma.users.findUnique({
+    where: {
+      email: payload.email,
+    },
+  });
+
+  if (existingEmailUser) {
+    const updatedUser = await this.prisma.users.update({
+      where: {
+        id: existingEmailUser.id,
+      },
+      data: {
+        google_id: payload.sub,
+      },
+    });
+
+    const jwt = this.generateToken(updatedUser);
+
+    return {
+      user: {
+        id: updatedUser.id,
+        nickname: updatedUser.nickname,
+        email: updatedUser.email,
+        birth_date: updatedUser.birth_date,
+        avatar_url: updatedUser.avatar_url,
+        google_id: updatedUser.google_id,
+        role: updatedUser.role,
+        created_at: updatedUser.created_at,
+        updated_at: updatedUser.updated_at,
+      },
+      token: jwt,
+    };
+  }
+
+  const newUser = await this.prisma.users.create({
+    data: {
+      nickname: payload.name ?? payload.email.split('@')[0],
+      email: payload.email,
+      google_id: payload.sub,
+      password_hash: null,
+      avatar_url: payload.picture ?? null,
+    },
+  });
+
+  const jwt = this.generateToken(newUser);
+
+  return {
+    user: {
+      id: newUser.id,
+      nickname: newUser.nickname,
+      email: newUser.email,
+      birth_date: newUser.birth_date,
+      avatar_url: newUser.avatar_url,
+      google_id: newUser.google_id,
+      role: newUser.role,
+      created_at: newUser.created_at,
+      updated_at: newUser.updated_at,
+    },
+    token: jwt,
+  };
+}
 }
