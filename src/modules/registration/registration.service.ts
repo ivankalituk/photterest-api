@@ -29,18 +29,23 @@ export class RegistrationService {
         birth_date: new Date(dto.birth_date),
         password_hash: hashedPassword,
       },
+      select: {
+        id: true,
+        nickname: true,
+        email: true,
+        birth_date: true,
+        avatar_url: true,
+        google_id: true,
+        role: true,
+        created_at: true,
+        updated_at: true,
+      }
     });
 
     const token = this.authService.generateToken(user);
 
     return {
-      user: {
-        id: user.id,
-        nickname: user.nickname,
-        email: user.email,
-        role: user.role,
-      },
-
+      user,
       token,
     };
   }

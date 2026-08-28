@@ -51,12 +51,16 @@ export class AuthService {
         nickname: user.nickname,
         email: user.email,
         role: user.role,
+        birth_date: user.birth_date,
+        avatar_url: user.avatar_url,
+        google_id: user.google_id,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
       },
       token,
     };
   }
 
-  // make async while getting data
   logOut() {
     return { message: 'success' };
   }
@@ -91,8 +95,12 @@ export class AuthService {
           id: existingGoogleUser.id,
           nickname: existingGoogleUser.nickname,
           email: existingGoogleUser.email,
+          birth_date: existingGoogleUser.birth_date,
           avatar_url: existingGoogleUser.avatar_url,
+          google_id: existingGoogleUser.google_id,
           role: existingGoogleUser.role,
+          created_at: existingGoogleUser.created_at,
+          updated_at: existingGoogleUser.updated_at,
         },
         token: jwt,
       };
@@ -121,8 +129,12 @@ export class AuthService {
           id: updatedUser.id,
           nickname: updatedUser.nickname,
           email: updatedUser.email,
+          birth_date: updatedUser.birth_date,
           avatar_url: updatedUser.avatar_url,
+          google_id: updatedUser.google_id,
           role: updatedUser.role,
+          created_at: updatedUser.created_at,
+          updated_at: updatedUser.updated_at,
         },
         token: jwt,
       };
@@ -145,8 +157,12 @@ export class AuthService {
         id: newUser.id,
         nickname: newUser.nickname,
         email: newUser.email,
+        birth_date: newUser.birth_date,
         avatar_url: newUser.avatar_url,
+        google_id: newUser.google_id,
         role: newUser.role,
+        created_at: newUser.created_at,
+        updated_at: newUser.updated_at,
       },
       token: jwt,
     };
