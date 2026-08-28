@@ -1,4 +1,12 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import type { Request } from 'express';
+
 import { AuthService } from './auth.service';
 import { LoginDTO } from './dto/login.dto';
 import { GoogleAuthDTO } from './dto/googleAuth.dto';
@@ -20,7 +28,9 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  logout() {
+  logout(@Req() req: Request) {
+    console.log(req.cookies);
+
     return this.authService.logOut();
   }
 }
