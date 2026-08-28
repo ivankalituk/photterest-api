@@ -7,4 +7,7 @@ export class RegistrationDTO {
   @IsString()
   @Length(6, 50)
   password: string;
+
+  @IsString()
+  birth_date: string
 }

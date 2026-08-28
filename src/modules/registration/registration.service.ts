@@ -26,6 +26,7 @@ export class RegistrationService {
       data: {
         nickname: dto.email,
         email: dto.email,
+        birth_date: new Date(dto.birth_date),
         password_hash: hashedPassword,
       },
     });
