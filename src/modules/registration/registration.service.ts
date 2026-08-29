@@ -3,6 +3,7 @@ import { AuthService } from '../auth/auth.service';
 import { RegistrationDTO } from './dto/registration.dto';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { userSelect } from '../users/selects/user.select';
 
 @Injectable()
 export class RegistrationService {
@@ -29,17 +30,7 @@ export class RegistrationService {
         birth_date: new Date(dto.birth_date),
         password_hash: hashedPassword,
       },
-      select: {
-        id: true,
-        nickname: true,
-        email: true,
-        birth_date: true,
-        avatar_url: true,
-        google_id: true,
-        role: true,
-        created_at: true,
-        updated_at: true,
-      }
+      select: userSelect
     });
 
     const token = this.authService.generateToken(user);
