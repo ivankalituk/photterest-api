@@ -13,8 +13,7 @@ import { AuthController } from './auth.controller';
     JwtModule.register({
       secret: 'SUPER_SECRET_KEY',
       signOptions: {
-        // пока не знаю насколько сделать
-        expiresIn: '15m',
+        expiresIn: '7d',
       },
     }),
   ],
