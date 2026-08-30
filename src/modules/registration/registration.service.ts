@@ -30,7 +30,7 @@ export class RegistrationService {
         birth_date: new Date(dto.birth_date),
         password_hash: hashedPassword,
       },
-      select: userSelect
+      select: userSelect,
     });
 
     const token = this.authService.generateToken(user);

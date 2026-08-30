@@ -5,11 +5,12 @@ import {
 } from '@nestjs/common';
 
 import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
   handleRequest(err: any, user: any, info: any, context: ExecutionContext) {
-    const response = context.switchToHttp().getResponse();
+    const response: Response = context.switchToHttp().getResponse();
 
     if (err || !user) {
       response.clearCookie('access_token', {

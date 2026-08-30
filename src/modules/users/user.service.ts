@@ -9,7 +9,7 @@ export class UsersService {
   async findById(id: string) {
     const user = await this.prisma.users.findUnique({
       where: { id: id },
-      select: userSelect
+      select: userSelect,
     });
 
     return user;

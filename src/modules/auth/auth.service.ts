@@ -3,14 +3,12 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginDTO } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { OAuth2Client } from 'google-auth-library';
 import { JwtUser } from './interfaces/jwt-user.interface';
 import { userAuthSelect } from '../users/selects/user.select';
+import { GoogleUserInfo } from './interfaces/google-payload.interface';
 
 @Injectable()
 export class AuthService {
-  private googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
   constructor(
     private jwtService: JwtService,
     private readonly prisma: PrismaService,
@@ -25,35 +23,35 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
 
-async login(dto: LoginDTO) {
-  const user = await this.prisma.users.findUnique({
-    where: { email: dto.email },
-    select: userAuthSelect,
-  });
+  async login(dto: LoginDTO) {
+    const user = await this.prisma.users.findUnique({
+      where: { email: dto.email },
+      select: userAuthSelect,
+    });
 
-  if (!user) {
-    throw new UnauthorizedException('Invalid credentials');
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    if (!user.password_hash) {
+      throw new UnauthorizedException('You was logged in without password');
+    }
+
+    const isValid = await bcrypt.compare(dto.password, user.password_hash);
+
+    if (!isValid) {
+      throw new UnauthorizedException('Invalid password');
+    }
+
+    const token = this.generateToken(user);
+
+    const { password_hash, ...publicUser } = user;
+
+    return {
+      user: publicUser,
+      token,
+    };
   }
-
-  if (!user.password_hash) {
-    throw new UnauthorizedException('You was logged in without password');
-  }
-
-  const isValid = await bcrypt.compare(dto.password, user.password_hash);
-
-  if (!isValid) {
-    throw new UnauthorizedException('Invalid password');
-  }
-
-  const token = this.generateToken(user);
-
-  const { password_hash, ...publicUser } = user;
-
-  return {
-    user: publicUser,
-    token,
-  };
-}
 
   logOut() {
     return { message: 'success' };
@@ -73,7 +71,7 @@ async login(dto: LoginDTO) {
       throw new UnauthorizedException('Invalid Google access token');
     }
 
-    const payload = await response.json();
+    const payload: GoogleUserInfo = await response.json();
 
     if (!payload.sub || !payload.email) {
       throw new UnauthorizedException('Invalid Google account data');
@@ -92,7 +90,7 @@ async login(dto: LoginDTO) {
     if (existingGoogleUser) {
       const jwt = this.generateToken(existingGoogleUser);
 
-  const { password_hash, ...publicUser } = existingGoogleUser;
+      const { password_hash, ...publicUser } = existingGoogleUser;
 
       return {
         user: publicUser,

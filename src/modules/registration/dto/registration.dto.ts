@@ -9,5 +9,5 @@ export class RegistrationDTO {
   password: string;
 
   @IsString()
-  birth_date: string
+  birth_date: string;
 }

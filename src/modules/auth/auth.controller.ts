@@ -1,10 +1,4 @@
-import {
-  Body,
-  Controller,
-  Post,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
 import { LoginDTO } from './dto/login.dto';
@@ -21,37 +15,37 @@ export class AuthController {
     @Body() dto: LoginDTO,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const {user, token} = await this.authService.login(dto);
+    const { user, token } = await this.authService.login(dto);
 
     res.cookie('access_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-    })
+    });
 
-    return{
-      user
-    }
+    return {
+      user,
+    };
   }
 
   @Post('google')
   async googleLogin(
     @Body() dto: GoogleAuthDTO,
-    @Res({ passthrough: true }) res: Response
+    @Res({ passthrough: true }) res: Response,
   ) {
-    const {user, token} = await this.authService.googleLogin(dto.token);
+    const { user, token } = await this.authService.googleLogin(dto.token);
 
     res.cookie('access_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-    })
+    });
 
-    return{
-      user
-    }
+    return {
+      user,
+    };
   }
 
   @UseGuards(JwtAuthGuard)
