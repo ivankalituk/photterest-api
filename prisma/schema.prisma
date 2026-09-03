@@ -27,7 +27,7 @@ model users {
 
 model boards {
   id            String       @id @default(uuid()) @db.Uuid
-  name          String
+  name          String       @db.VarChar(30)
   user_id       String       @db.Uuid
 
   private       Boolean      @default(false)
