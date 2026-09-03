@@ -7,6 +7,7 @@ import { RegistrationModule } from './modules/registration/registration.module';
 import { UsersModule } from './modules/users/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { BoardsModule } from './modules/boards/boards.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AuthModule } from './modules/auth/auth.module';
     RegistrationModule,
     UsersModule,
     AuthModule,
+    BoardsModule,
   ],
 
   controllers: [AppController],
