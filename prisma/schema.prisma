@@ -33,12 +33,13 @@ model users {
   updated_at    DateTime @updatedAt @db.Timestamptz(6)
 
   boards        boards[]
+  pins          pins[]
 }
 
 model boards {
   id            String       @id @default(uuid()) @db.Uuid
   name          String       @db.VarChar(30)
-  user_id       String       @db.Uuid
+  creator_id    String       @db.Uuid
 
   private       Boolean      @default(false)
   deleted       Boolean      @default(false)
@@ -46,18 +47,38 @@ model boards {
   created_at    DateTime     @default(now()) @db.Timestamptz(6)
   updated_at    DateTime     @updatedAt @db.Timestamptz(6)
 
-  user users @relation(fields: [user_id], references: [id])
+  creator users @relation(fields: [creator_id], references: [id])
+  origin_pins pins[]
 }
 
 model media {
   id              String      @id @default(uuid()) @db.Uuid
   filename        String      @unique @db.VarChar(255)
   original_name   String?     @db.VarChar(255)
-  mimeType        String      @db.VarChar(150)
+  mime_type       String      @db.VarChar(150)
   type            MediaType
   size            Int
   path            String      @db.VarChar(255)
   
   created_at      DateTime @default(now()) @db.Timestamptz(6)
   updated_at      DateTime @updatedAt @db.Timestamptz(6) 
+}
+
+model pins {
+  id                String      @id @default(uuid()) @db.Uuid
+  name              String      @db.VarChar(255)
+  description       String?     @db.Text
+  link              String?     @db.VarChar(2048)
+  origin_board_id          String      @db.Uuid
+  tags              String[]    @db.VarChar(255)
+  ai_changed        Boolean     @default(false)
+  ai_people_changed Boolean     @default(false)
+  allow_comments    Boolean     @default(false)
+  creator_id        String      @db.Uuid
+  
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime @updatedAt @db.Timestamptz(6) 
+
+  creator users @relation(fields: [creator_id], references: [id])
+  origin_board boards @relation(fields: [origin_board_id], references: [id])
 }
