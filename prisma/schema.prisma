@@ -59,9 +59,11 @@ model media {
   type            MediaType
   size            Int
   path            String      @db.VarChar(255)
-  
-  created_at      DateTime @default(now()) @db.Timestamptz(6)
-  updated_at      DateTime @updatedAt @db.Timestamptz(6) 
+
+  created_at      DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime    @updatedAt @db.Timestamptz(6)
+
+  pin_media       pin_media[]
 }
 
 model pins {
@@ -69,16 +71,29 @@ model pins {
   name              String      @db.VarChar(255)
   description       String?     @db.Text
   link              String?     @db.VarChar(2048)
-  origin_board_id          String      @db.Uuid
+  origin_board_id   String      @db.Uuid
   tags              String[]    @db.VarChar(255)
   ai_changed        Boolean     @default(false)
   ai_people_changed Boolean     @default(false)
   allow_comments    Boolean     @default(false)
   creator_id        String      @db.Uuid
-  
-  created_at      DateTime @default(now()) @db.Timestamptz(6)
-  updated_at      DateTime @updatedAt @db.Timestamptz(6) 
 
-  creator users @relation(fields: [creator_id], references: [id])
-  origin_board boards @relation(fields: [origin_board_id], references: [id])
+  media             pin_media[]
+
+  created_at        DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime    @updatedAt @db.Timestamptz(6)
+
+  creator           users       @relation(fields: [creator_id], references: [id])
+  origin_board      boards      @relation(fields: [origin_board_id], references: [id])
+}
+
+model pin_media {
+  id        String   @id @default(uuid()) @db.Uuid
+  pin_id    String   @db.Uuid
+  media_id  String   @db.Uuid
+
+  pin       pins     @relation(fields: [pin_id], references: [id], onDelete: Cascade)
+  media     media    @relation(fields: [media_id], references: [id], onDelete: Cascade)
+
+  @@unique([pin_id, media_id])
 }
