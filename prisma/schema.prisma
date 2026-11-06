@@ -6,6 +6,16 @@ datasource db {
   provider = "postgresql"
 }
 
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  MUSIC
+  DOCUMENT
+  OTHER
+}
+
+
 model users {
   id            String   @id @default(uuid()) @db.Uuid
 
@@ -37,4 +47,17 @@ model boards {
   updated_at    DateTime     @updatedAt @db.Timestamptz(6)
 
   user users @relation(fields: [user_id], references: [id])
+}
+
+model media {
+  id              String      @id @default(uuid()) @db.Uuid
+  filename        String      @unique @db.VarChar(255)
+  original_name   String?     @db.VarChar(255)
+  mimeType        String      @db.VarChar(150)
+  type            MediaType
+  size            Int
+  path            String      @db.VarChar(255)
+  
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime @updatedAt @db.Timestamptz(6) 
 }
