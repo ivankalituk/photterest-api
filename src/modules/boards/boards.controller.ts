@@ -19,15 +19,15 @@ export class BoardsController {
         return this.boardsService.getAll()
     }
 
-    @Get(':id')
-    getUnique(@Param('id') id: string){
-        return this.boardsService.getById(id)
-    }
-
     @UseGuards(JwtAuthGuard)
     @Get('mine')
     getMine(@Req() req: AuthenticatedRequest){
         return this.boardsService.getByUser(req.user.id)
+    }
+
+    @Get(':id')
+    getUnique(@Param('id') id: string){
+        return this.boardsService.getById(id)
     }
 
     @Get('by-user/:id')
