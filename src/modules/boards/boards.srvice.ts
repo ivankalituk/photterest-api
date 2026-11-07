@@ -22,7 +22,7 @@ export class BoardsService {
 
     async getByUser(user_id: string){
         const boards = await this.prisma.boards.findMany({
-            where: {user_id: user_id}
+            where: {creator_id: user_id}
         })
 
         return boards
@@ -31,7 +31,7 @@ export class BoardsService {
     async createBoard(dto: BoardsDTO, user_id: string){
         const board = await this.prisma.boards.create({
             data: {
-                user_id: user_id,
+                creator_id: user_id,
                 name: dto.name,
                 private: dto.private
             }
