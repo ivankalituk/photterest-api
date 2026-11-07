@@ -46,6 +46,7 @@ model boards {
 
   created_at    DateTime     @default(now()) @db.Timestamptz(6)
   updated_at    DateTime     @updatedAt @db.Timestamptz(6)
+  pins_updated_at DateTime @default(now()) @db.Timestamptz(6)
 
   creator users @relation(fields: [creator_id], references: [id])
   origin_pins pins[]

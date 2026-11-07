@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "boards" ADD COLUMN     "pins_updated_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP;
