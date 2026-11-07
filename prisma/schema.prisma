@@ -49,6 +49,7 @@ model boards {
 
   creator users @relation(fields: [creator_id], references: [id])
   origin_pins pins[]
+  board_pins board_pins[]
 }
 
 model media {
@@ -85,6 +86,7 @@ model pins {
 
   creator           users       @relation(fields: [creator_id], references: [id])
   origin_board      boards      @relation(fields: [origin_board_id], references: [id])
+  board_pins board_pins[]
 }
 
 model pin_media {
@@ -96,4 +98,15 @@ model pin_media {
   media     media    @relation(fields: [media_id], references: [id], onDelete: Cascade)
 
   @@unique([pin_id, media_id])
+}
+
+model board_pins {
+  id        String   @id @default(uuid()) @db.Uuid
+  pin_id    String   @db.Uuid
+  board_id  String   @db.Uuid
+
+  pin       pins     @relation(fields: [pin_id], references: [id], onDelete: Cascade)
+  board     boards   @relation(fields: [board_id], references: [id], onDelete: Cascade)
+
+  @@unique([pin_id, board_id])
 }
