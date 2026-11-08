@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { BoardsDTO } from "./dto/boards.dto";
-import { QueryOptionsType } from "src/shared/interfaces/query-options.interface";
+import { QueryOptionsType } from "src/shared/queryOptions/interfaces/query-options.interface";
 
 @Injectable()
 export class BoardsService {
@@ -9,11 +9,10 @@ export class BoardsService {
 
     async getAll(options: QueryOptionsType){
         const boards = await this.prisma.boards.findMany({
-                orderBy: options.orderBy,
-                skip: options.skip,
-                take: options.take
-            }
-        )
+            skip: options.skip,
+            take: options.take,
+            orderBy: options.orderBy
+        })
 
         return boards
     }

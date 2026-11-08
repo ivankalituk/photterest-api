@@ -1,11 +1,10 @@
-import { Body, Controller, Get, Param, Post, Req, UseGuards, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { BoardsService } from "./boards.srvice";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { JwtUser } from "../auth/interfaces/jwt-user.interface";
 import { BoardsDTO } from "./dto/boards.dto";
-import { QueryOptions } from "src/shared/decorators/query-options.decorator";
-import { QueryOptionsDTO } from "src/shared/dto/query-options.dto";
-import { QueryOptionsType } from "src/shared/interfaces/query-options.interface";
+import { QueryOptionsPipe } from "src/shared/queryOptions/pipes/query-options.pipe";
+import type { QueryOptionsType } from "src/shared/queryOptions/interfaces/query-options.interface";
 
 // refactor this
 interface AuthenticatedRequest extends Request {
@@ -19,8 +18,7 @@ export class BoardsController {
 
     @Get()
     getAll(
-        @QueryOptions(new ValidationPipe({ transform: true }))
-        options: QueryOptionsType
+        @Query(QueryOptionsPipe) options: QueryOptionsType
     ) {
         return this.boardsService.getAll(options);
     }
