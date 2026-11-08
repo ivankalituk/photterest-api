@@ -2,19 +2,31 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { BoardsDTO } from "./dto/boards.dto";
 import { QueryOptionsType } from "src/shared/queryOptions/interfaces/query-options.interface";
+import { createPaginatedResponse } from "src/shared/createPaginatedResponse/createPaginatedResponse";
 
 @Injectable()
 export class BoardsService {
     constructor (private readonly prisma: PrismaService) {}
 
     async getAll(options: QueryOptionsType){
-        const boards = await this.prisma.boards.findMany({
-            skip: options.skip,
-            take: options.take,
-            orderBy: options.orderBy
-        })
+    const where = { deleted: false };
 
-        return boards
+        const [boards, totalElements] = await Promise.all([
+            this.prisma.boards.findMany({
+                where,
+                orderBy: options.orderBy,
+                skip: options.skip,
+                take: options.take
+            }),
+            this.prisma.boards.count({ where })
+        ]);
+
+        return createPaginatedResponse(
+            boards,
+            totalElements,
+            options.skip / options.take + 1,
+            options.take
+        )
     }
 
     async getById(id: string){
