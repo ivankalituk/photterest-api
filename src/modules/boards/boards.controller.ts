@@ -25,8 +25,11 @@ export class BoardsController {
 
     @UseGuards(JwtAuthGuard)
     @Get('mine')
-    getMine(@Req() req: AuthenticatedRequest){
-        return this.boardsService.getByUser(req.user.id)
+    getMine(
+        @Req() req: AuthenticatedRequest,  
+        @Query(QueryOptionsPipe) options: QueryOptionsType
+    ){
+        return this.boardsService.getByUser(req.user.id, options)
     }
 
     @Get(':id')
@@ -35,8 +38,11 @@ export class BoardsController {
     }
 
     @Get('by-user/:id')
-    getByUser(@Param('id') id: string){
-        return this.boardsService.getByUser(id)
+    getByUser(
+        @Param('id') id: string,
+         @Query(QueryOptionsPipe) options: QueryOptionsType
+    ){
+        return this.boardsService.getByUser(id, options)
     }
 
     @UseGuards(JwtAuthGuard)
