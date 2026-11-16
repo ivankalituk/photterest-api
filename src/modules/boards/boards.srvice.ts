@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { BoardsDTO } from "./dto/boards.dto";
 import type { QueryOptionsType } from "src/shared/queryOptions/interfaces/query-options.interface";
@@ -62,8 +62,30 @@ export class BoardsService {
         )
     }
 
-    async createBoard(dto: BoardsDTO, user_id: string){
-        const board = await this.prisma.boards.create({
+async createBoard(dto: BoardsDTO, user_id: string) {
+    return await this.prisma.$transaction(async (tx) => {
+        const coauthors = dto.coauthors.filter(id => id !== user_id);
+
+        if (coauthors.length > 0) {
+            const existingUsers = await tx.users.findMany({
+                where: {
+                    id: {
+                        in: coauthors
+                    }
+                },
+                select: {
+                    id: true
+                }
+            });
+
+            if (existingUsers.length !== coauthors.length) {
+                throw new BadRequestException(
+                    "SONE OF USERS DONT EXIST"
+                );
+            }
+        }
+
+        const board = await tx.boards.create({
             data: {
                 creator_id: user_id,
                 name: dto.name,
@@ -71,6 +93,16 @@ export class BoardsService {
             }
         });
 
-        return board
-    }
+        if (coauthors.length > 0) {
+            await tx.board_coauthors.createMany({
+                data: coauthors.map(coauthor_id => ({
+                    board_id: board.id,
+                    user_id: coauthor_id
+                }))
+            });
+        }
+
+        return board;
+    });
+}
 }

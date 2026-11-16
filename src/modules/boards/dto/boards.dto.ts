@@ -1,4 +1,4 @@
-import { IsBoolean, IsString, Length } from "class-validator";
+import { ArrayUnique, IsArray, IsBoolean, IsOptional, IsString, IsUUID, Length } from "class-validator";
 
 export class BoardsDTO{
     @IsString()
@@ -7,4 +7,10 @@ export class BoardsDTO{
 
     @IsBoolean()
     private: boolean
+
+    @IsOptional()
+    @IsArray()
+    @IsUUID("4", { each: true })
+    @ArrayUnique()
+    coauthors: string[];
 }
