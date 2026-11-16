@@ -34,6 +34,7 @@ model users {
 
   boards        boards[]
   pins          pins[]
+  board_coauthors board_coauthors[]
 }
 
 model boards {
@@ -51,6 +52,7 @@ model boards {
   creator users @relation(fields: [creator_id], references: [id])
   origin_pins pins[]
   board_pins board_pins[]
+  board_coauthors board_coauthors[]
 }
 
 model media {
@@ -110,4 +112,17 @@ model board_pins {
   board     boards   @relation(fields: [board_id], references: [id], onDelete: Cascade)
 
   @@unique([pin_id, board_id])
+}
+
+model board_coauthors {
+  id                String   @id @default(uuid()) @db.Uuid
+  board_id          String   @db.Uuid
+  user_id           String   @db.Uuid
+  created_at        DateTime    @default(now()) @db.Timestamptz(6)
+
+  board boards  @relation(fields: [board_id], references: [id], onDelete: Cascade)
+  user users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([board_id, user_id])
+  @@index([user_id])
 }
