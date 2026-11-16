@@ -24,7 +24,7 @@ export class BoardsService {
         return createPaginatedResponse(
             boards,
             totalElements,
-            options.skip / options.take + 1,
+            Math.floor(options.skip / options.take) + 1,
             options.take
         )
     }
@@ -57,52 +57,52 @@ export class BoardsService {
         return createPaginatedResponse(
             boards,
             totalElements,
-            options.skip / options.take + 1,
+            Math.floor(options.skip / options.take) + 1,
             options.take
         )
     }
 
-async createBoard(dto: BoardsDTO, user_id: string) {
-    return await this.prisma.$transaction(async (tx) => {
-        const coauthors = dto.coauthors.filter(id => id !== user_id);
+    async createBoard(dto: BoardsDTO, user_id: string) {
+        return await this.prisma.$transaction(async (tx) => {
+            const coauthors = dto.coauthors.filter(id => id !== user_id);
 
-        if (coauthors.length > 0) {
-            const existingUsers = await tx.users.findMany({
-                where: {
-                    id: {
-                        in: coauthors
+            if (coauthors.length > 0) {
+                const existingUsers = await tx.users.findMany({
+                    where: {
+                        id: {
+                            in: coauthors
+                        }
+                    },
+                    select: {
+                        id: true
                     }
-                },
-                select: {
-                    id: true
+                });
+
+                if (existingUsers.length !== coauthors.length) {
+                    throw new BadRequestException(
+                        "SOME OF USERS DONT EXIST"
+                    );
+                }
+            }
+
+            const board = await tx.boards.create({
+                data: {
+                    creator_id: user_id,
+                    name: dto.name,
+                    private: dto.private
                 }
             });
 
-            if (existingUsers.length !== coauthors.length) {
-                throw new BadRequestException(
-                    "SONE OF USERS DONT EXIST"
-                );
+            if (coauthors.length > 0) {
+                await tx.board_coauthors.createMany({
+                    data: coauthors.map(coauthor_id => ({
+                        board_id: board.id,
+                        user_id: coauthor_id
+                    }))
+                });
             }
-        }
 
-        const board = await tx.boards.create({
-            data: {
-                creator_id: user_id,
-                name: dto.name,
-                private: dto.private
-            }
+            return board;
         });
-
-        if (coauthors.length > 0) {
-            await tx.board_coauthors.createMany({
-                data: coauthors.map(coauthor_id => ({
-                    board_id: board.id,
-                    user_id: coauthor_id
-                }))
-            });
-        }
-
-        return board;
-    });
-}
+    }
 }

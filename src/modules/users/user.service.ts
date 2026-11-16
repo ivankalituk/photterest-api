@@ -31,7 +31,7 @@ export class UsersService {
     return createPaginatedResponse(
       users,
       totalElements,
-      options.skip / options.take + 1,
+      Math.floor(options.skip / options.take) + 1,
       options.take
     );
   }

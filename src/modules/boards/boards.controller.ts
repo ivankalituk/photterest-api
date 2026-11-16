@@ -40,7 +40,7 @@ export class BoardsController {
     @Get('by-user/:id')
     getByUser(
         @Param('id') id: string,
-         @Query(QueryOptionsPipe) options: QueryOptionsType
+        @Query(QueryOptionsPipe) options: QueryOptionsType
     ){
         return this.boardsService.getByUser(id, options)
     }
